@@ -1,3 +1,6 @@
+from fastapi.responses import FileResponse
+from fastapi.staticfiles import StaticFiles
+import os
 from fastapi import FastAPI, Response
 from fastapi.middleware.cors import CORSMiddleware
 import requests
@@ -100,3 +103,12 @@ def home():
 @app.get("/health")
 def health():
     return {"status": "online", "bot": "@golpress_radar_ofc_bot"}
+    @app.get("/")
+def home():
+    if os.path.exists("index.html"):
+        return FileResponse("index.html")
+    return {"status": "GolPress API Online", "bot": "@golpress_radar_ofc_bot", "docs": "/docs"}
+
+@app.get("/health")
+def health():
+    return {"status": "ok"}
