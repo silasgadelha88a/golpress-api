@@ -89,4 +89,14 @@ def dashboard():
 <div id="lista">Carregando GolPress...</div>
 <script>async function testar(){document.getElementById('testResult').innerText='Enviando...';let r=await fetch('/test-telegram');let d=await r.json();document.getElementById('testResult').innerText=d.enviado?'✅ Enviado pro seu GolPress!':'❌ Erro token';}
 async function load(){document.getElementById('hora').innerText=new Date().toLocaleTimeString();let r=await fetch('/jogos/ao-vivo');let d=await r.json();let jogos=d.jogos||[];let stats=document.getElementById('stats');let alta=jogos.filter(j=>j.selo=='ALTA').length;stats.innerHTML='<div class="c" style="flex:1">Total<br><b>'+jogos.length+'</b></div><div class="c" style="flex:1;background:#00ff8822">ALTA<br><b>'+alta+'</b></div>';if(jogos.length==0){document.getElementById('lista').innerHTML='<div style="text-align:center;padding:40px;color:#888">Sem jogos ao vivo agora.<br>Volta 15h-22h<br></div>';return;}let html='<table><tr><th>JOGO</th><th>PLACAR</th><th>PRESSAO</th></tr>';jogos.forEach(j=>{let p=j.estatisticas.barra_pressao;let cls=p>=75?'green':p>=50?'yellow':'red';let badge=p>=75?'ba':p>=50?'bm':'bb';html+='<tr><td><b>'+j.casa+'</b> x '+j.fora+'<br><small style=color:#888>'+j.liga+' - '+j.minuto+'</small></td><td><b>'+j.placar+'</b></td><td>'+p+'% <span class="b '+badge+'">'+j.selo+'</span><div class="bar"><div class="fill '+cls+'" style="width:'+p+'%"></div></div></td></tr>';});html+='</table>';document.getElementById('lista').innerHTML=html;}load();setInterval(load,30000);</script></body></html>"""
-    return Response(content=html, media_type="text/html")
+    return Response(content=html, media_type="text/html") 
+
+from fastapi.responses import FileResponse
+
+@app.get("/")
+def home():
+    return FileResponse("index.html")
+
+@app.get("/health")
+def health():
+    return {"status": "online", "bot": "@golpress_radar_ofc_bot"}
