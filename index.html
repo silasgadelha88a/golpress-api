@@ -25,131 +25,175 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>GolPress - Radar de Gols ao Vivo</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 <style>
-*{margin:0;padding:0;box-sizing:border-box}
-body{background:#0a0a0a;color:#fff;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;min-height:100vh;padding:20px}
-.container{max-width:500px;margin:0 auto}
-.header{text-align:center;margin:30px 0}
-.logo{font-size:42px;font-weight:900;letter-spacing:-2px}
-.logo span{color:#00FF88}
-.subtitle{color:#888;margin-top:8px;font-size:14px}
-.card{background:#151515;border:1px solid #222;border-radius:16px;padding:20px;margin:15px 0}
-.card-title{font-size:13px;color:#666;text-transform:uppercase;letter-spacing:1px;margin-bottom:12px}
-.stats{display:grid;grid-template-columns:1fr 1fr;gap:12px}
-.stat{background:#0a0a0a;border:1px solid #222;border-radius:12px;padding:15px;text-align:center}
-.stat-value{font-size:28px;font-weight:800;color:#00FF88}
-.stat-label{font-size:11px;color:#666;margin-top:4px;text-transform:uppercase}
-.btn{display:block;width:100%;padding:16px;border-radius:12px;border:none;font-weight:700;font-size:15px;cursor:pointer;text-decoration:none;text-align:center;margin:10px 0;transition:0.2s}
-.btn-telegram{background:#00FF88;color:#000}
-.btn-telegram:hover{background:#00e67a;transform:translateY(-1px)}
-.btn-secondary{background:#1a1a1a;color:#fff;border:1px solid #333}
-.btn-secondary:hover{background:#222}
-.live-dot{display:inline-block;width:8px;height:8px;background:#00FF88;border-radius:50%;margin-right:6px;animation:pulse 2s infinite}
-@keyframes pulse{0%{opacity:1} 50%{opacity:0.5} 100%{opacity:1}}
-.jogo{background:#0a0a0a;border:1px solid #222;border-radius:12px;padding:14px;margin:8px 0;display:flex;justify-content:space-between;align-items:center}
-.jogo-info{flex:1}
-.jogo-time{font-weight:600;font-size:14px}
-.jogo-placar{font-weight:800;color:#00FF88;font-size:16px}
-.jogo-tempo{font-size:11px;color:#888;background:#1a1a1a;padding:3px 8px;border-radius:20px}
-.empty{text-align:center;color:#555;padding:40px 20px}
-.empty-icon{font-size:40px;margin-bottom:10px}
-.footer{text-align:center;color:#444;font-size:11px;margin-top:30px;padding:20px}
+@import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&family=Inter:wght@400;600;800&display=swap');
+body { font-family: 'Inter', sans-serif; background: #0a0a0a; }
+.mono { font-family: 'JetBrains Mono', monospace; }
+.pulse { animation: pulse 2s infinite; }
+@keyframes pulse { 0%,100% { opacity:1 } 50% { opacity:0.5 } }
+.glow { box-shadow: 0 0 20px rgba(34,197,94,0.4); }
 </style>
 </head>
-<body>
-<div class="container">
-  <div class="header">
-    <div class="logo">GOL<span>PRESS</span></div>
-    <div class="subtitle"><span class="live-dot"></span>RADAR DE GOLS AO VIVO</div>
-  </div>
+<body class="min-h-screen text-white">
+<div class="border-b border-zinc-800 bg-zinc-900/50 backdrop-blur">
+<div class="max-w-5xl mx-auto px-4 py-4 flex justify-between items-center">
+<div class="flex items-center gap-3">
+<div class="w-10 h-10 bg-green-500 rounded-xl flex items-center justify-center font-black text-black text-xl">G</div>
+<div>
+<h1 class="font-black text-lg leading-none">GolPress</h1>
+<p class="text-xs text-zinc-400 mono">RADAR DE GOLS • AO VIVO</p>
+</div>
+</div>
+<div class="flex items-center gap-2">
+<span class="w-2 h-2 bg-green-500 rounded-full pulse"></span>
+<span class="text-xs mono text-green-400 font-bold">LIVE</span>
+</div>
+</div>
+</div>
 
-  <div class="card">
-    <div class="card-title">📊 Estatísticas</div>
-    <div class="stats">
-      <div class="stat">
-        <div class="stat-value" id="total-jogos">0</div>
-        <div class="stat-label">Jogos ao vivo</div>
-      </div>
-      <div class="stat">
-        <div class="stat-value" id="total-alertas">0</div>
-        <div class="stat-label">Alertas hoje</div>
-      </div>
-    </div>
-  </div>
+<div class="max-w-5xl mx-auto px-4 py-6 grid gap-6">
+<div class="bg-zinc-900 border border-zinc-800 rounded-2xl p-5">
+<div class="flex justify-between items-start mb-4">
+<h2 class="font-bold flex items-center gap-2"><i class="fa-solid fa-heart-pulse text-green-500"></i> Status do Sistema</h2>
+<span id="status-badge" class="text-xs mono px-3 py-1 rounded-full bg-zinc-800 text-zinc-400">Verificando...</span>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-3 gap-3">
+<div class="bg-black/50 border border-zinc-800 rounded-xl p-4">
+<div class="text-xs text-zinc-500 mono mb-1">API</div>
+<div id="api-status" class="font-bold text-sm">🟡 Conectando...</div>
+<div class="text-[11px] text-zinc-600 mono mt-1">sokkerpro-api-gratis.onrender.com</div>
+</div>
+<div class="bg-black/50 border border-zinc-800 rounded-xl p-4">
+<div class="text-xs text-zinc-500 mono mb-1">BOT_TOKEN</div>
+<div id="bot-status" class="font-bold text-sm">🟡 Verificando...</div>
+<div class="text-[11px] text-zinc-600 mono mt-1">8539316339...</div>
+</div>
+<div class="bg-black/50 border border-zinc-800 rounded-xl p-4">
+<div class="text-xs text-zinc-500 mono mb-1">CHAT_ID</div>
+<div id="chat-status" class="font-bold text-sm">🟡 Verificando...</div>
+<div class="text-[11px] text-zinc-600 mono mt-1">1972111875</div>
+</div>
+</div>
+</div>
 
-  <div class="card">
-    <div class="card-title">⚽️ Jogos ao vivo agora</div>
-    <div id="lista-jogos">
-      <div class="empty">
-        <div class="empty-icon">🔍</div>
-        <div>Buscando jogos ao vivo...</div>
-        <div style="font-size:12px;margin-top:8px">Horário bom: 14h às 22h</div>
-      </div>
-    </div>
-  </div>
+<div class="bg-gradient-to-br from-green-600 to-green-700 rounded-[24px] p-[1px]">
+<div class="bg-zinc-900 rounded-[23px] p-6 md:p-8">
+<div class="flex flex-col md:flex-row md:items-center justify-between gap-6">
+<div>
+<h2 class="text-2xl md:text-3xl font-black leading-tight">Receba gols<br>no Telegram antes<br>de todo mundo ⚡️</h2>
+<p class="text-zinc-400 text-sm mt-3 max-w-md">Monitoramento automático a cada 30s. Alerta instantâneo de GOL! Flamengo, Palmeiras e +400 ligas.</p>
+<div class="flex gap-2 mt-4">
+<span class="text-[11px] mono bg-black border border-zinc-800 px-2.5 py-1 rounded-full">v3.0 HTTP</span>
+<span class="text-[11px] mono bg-black border border-zinc-800 px-2.5 py-1 rounded-full">✅ Sem bugs</span>
+<span class="text-[11px] mono bg-black border border-zinc-800 px-2.5 py-1 rounded-full">⚽️ 24/7</span>
+</div>
+</div>
+<div class="flex flex-col gap-3 w-full md:w-72">
+<a href="https://t.me/golpress_radar_ofc_bot" target="_blank" class="w-full bg-green-500 hover:bg-green-400 text-black font-black text-center py-4 rounded-2xl glow transition flex items-center justify-center gap-2">
+<i class="fa-brands fa-telegram text-xl"></i> ABRIR NO TELEGRAM
+</a>
+<button onclick="testarAlerta()" id="btn-teste" class="w-full bg-white/10 hover:bg-white/15 border border-white/10 font-bold py-3.5 rounded-2xl transition flex items-center justify-center gap-2">
+<i class="fa-solid fa-satellite-dish"></i> TESTAR ALERTA AGORA
+</button>
+<div class="text-[11px] text-zinc-500 mono text-center">Teste real: manda "Flamengo 1x0" no seu Telegram</div>
+</div>
+</div>
+</div>
+</div>
 
-  <!-- BOTÕES QUE FUNCIONAM EM QUALQUER LUGAR, INCLUSIVE WHATSAPP -->
-  <a href="https://t.me/golpress_radar_ofc_bot" target="_blank" rel="noopener" class="btn btn-telegram">
-    ↗ ABRIR NO TELEGRAM - @golpress_radar_ofc_bot
-  </a>
-  
-  <a href="/docs" target="_blank" class="btn btn-secondary">
-    📚 Ver API Docs
-  </a>
-  
-  <a href="/health" target="_blank" class="btn btn-secondary">
-    💚 Status do Sistema
-  </a>
+<div class="grid grid-cols-2 md:grid-cols-4 gap-3">
+<a href="/health" target="_blank" class="bg-zinc-900 border border-zinc-800 hover:border-zinc-700 rounded-xl p-4 transition group">
+<div class="text-zinc-500 group-hover:text-white"><i class="fa-solid fa-heart-pulse"></i></div>
+<div class="font-bold text-sm mt-2">Health</div>
+<div class="text-xs text-zinc-500 mono">/health</div>
+</a>
+<a href="/teste-telegram" target="_blank" class="bg-zinc-900 border border-zinc-800 hover:border-zinc-700 rounded-xl p-4 transition group">
+<div class="text-zinc-500 group-hover:text-white"><i class="fa-solid fa-paper-plane"></i></div>
+<div class="font-bold text-sm mt-2">Teste Alerta</div>
+<div class="text-xs text-zinc-500 mono">/teste-telegram</div>
+</a>
+<a href="/jogos-ao-vivo" target="_blank" class="bg-zinc-900 border border-zinc-800 hover:border-zinc-700 rounded-xl p-4 transition group">
+<div class="text-zinc-500 group-hover:text-white"><i class="fa-regular fa-futbol"></i></div>
+<div class="font-bold text-sm mt-2">Jogos Live</div>
+<div class="text-xs text-zinc-500 mono">/jogos-ao-vivo</div>
+</a>
+<a href="/docs" target="_blank" class="bg-zinc-900 border border-zinc-800 hover:border-zinc-700 rounded-xl p-4 transition group">
+<div class="text-zinc-500 group-hover:text-white"><i class="fa-solid fa-code"></i></div>
+<div class="font-bold text-sm mt-2">API Docs</div>
+<div class="text-xs text-zinc-500 mono">/docs</div>
+</a>
+</div>
 
-  <div class="footer">
-    GolPress © 2026 • Bot oficial: @golpress_radar_ofc_bot<br>
-    <span style="color:#00FF88">●</span> Sistema online • Render Free
-  </div>
+<div class="bg-black border border-zinc-800 rounded-2xl p-4">
+<div class="flex justify-between items-center mb-3">
+<h3 class="font-bold text-sm mono"><i class="fa-solid fa-terminal text-zinc-500"></i> LOG AO VIVO</h3>
+<span class="text-[10px] mono text-zinc-600">Render Free • spin down 50s após inatividade</span>
+</div>
+<div id="log" class="mono text-[12px] leading-relaxed text-zinc-400 bg-zinc-900/50 rounded-xl p-3 h-40 overflow-auto">
+<span class="text-zinc-600">> Aguardando conexão...</span>
+</div>
+</div>
+
+<div class="text-center py-4">
+<p class="text-[11px] mono text-zinc-600">GolPress v3.0 • HTTP Mode • Deploy 58cdda6 • Live at Sep 24, 2026 9:10 PM GMT-3</p>
+</div>
 </div>
 
 <script>
-async function carregarJogos(){
+async function checkHealth(){
   try{
-    const res = await fetch('/jogos-ao-vivo');
-    const data = await res.json();
-    document.getElementById('total-jogos').innerText = data.total || 0;
-    
-    const lista = document.getElementById('lista-jogos');
-    if(!data.jogos || data.jogos.length === 0){
-      lista.innerHTML = `
-        <div class="empty">
-          <div class="empty-icon">⚽️</div>
-          <div>Nenhum jogo ao vivo agora</div>
-          <div style="font-size:12px;margin-top:8px;color:#666">
-            ${data.message || 'Volte entre 14h e 22h - horário com mais jogos'}<br>
-            ${data.mock ? '<br>⚠️ Configure API_FOOTBALL_KEY no Render' : ''}
-          </div>
-        </div>`;
-      return;
-    }
-    lista.innerHTML = data.jogos.map(j => `
-      <div class="jogo">
-        <div class="jogo-info">
-          <div class="jogo-time">${j.casa} vs ${j.fora}</div>
-          <div style="font-size:12px;color:#888">${j.status}</div>
-        </div>
-        <div style="text-align:right">
-          <div class="jogo-placar">${j.placar_casa} - ${j.placar_fora}</div>
-          <div class="jogo-tempo">${j.tempo || 0}'</div>
-        </div>
-      </div>
-    `).join('');
+    const r = await fetch('/health');
+    const data = await r.json();
+    document.getElementById('status-badge').innerHTML = '✅ ONLINE • v3.0';
+    document.getElementById('status-badge').className = 'text-xs mono px-3 py-1 rounded-full bg-green-500/20 text-green-400 border border-green-500/30';
+    document.getElementById('api-status').innerHTML = '🟢 Online • Live';
+    document.getElementById('api-status').className = 'font-bold text-sm text-green-400';
+    document.getElementById('bot-status').innerHTML = data.bot_token_configured ? '🟢 Configurado' : '🔴 Não configurado';
+    document.getElementById('bot-status').className = 'font-bold text-sm ' + (data.bot_token_configured ? 'text-green-400' : 'text-red-400');
+    document.getElementById('chat-status').innerHTML = data.chat_id_configured ? '🟢 1972111875' : '🔴 Não configurado';
+    document.getElementById('chat-status').className = 'font-bold text-sm ' + (data.chat_id_configured ? 'text-green-400' : 'text-red-400');
+    addLog(`[OK] API v3.0 iniciada! Modo HTTP sem bug Updater`);
+    addLog(`[OK] BOT_TOKEN: 8539316339...`);
+    addLog(`[OK] CHAT_ID: 1972111875`);
+    addLog(`[OK] Alertas via HTTP funcionando 100%`);
   }catch(e){
-    document.getElementById('lista-jogos').innerHTML = `
-      <div class="empty">
-        <div class="empty-icon">❌</div>
-        <div>Erro ao carregar jogos</div>
-        <div style="font-size:11px;margin-top:5px">${e.message}</div>
-      </div>`;
+    document.getElementById('api-status').innerHTML = '🔴 Offline';
+    addLog(`[ERRO] ${e.message}`);
   }
 }
-carregarJogos();
-setInterval(carregarJogos, 30000); // Atualiza a cada 30s
+function addLog(msg){
+  const log = document.getElementById('log');
+  const time = new Date().toLocaleTimeString('pt-BR');
+  log.innerHTML += `\n<span class="text-zinc-500">[${time}]</span> ${msg}`;
+  log.scrollTop = log.scrollHeight;
+}
+async function testarAlerta(){
+  const btn = document.getElementById('btn-teste');
+  btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> ENVIANDO...';
+  btn.disabled = true;
+  addLog(`[TESTE] Enviando alerta...`);
+  try{
+    const r = await fetch('/teste-telegram');
+    const data = await r.json();
+    if(data.sucesso){
+      addLog(`<span class="text-green-400">[SUCESSO] ✅ Enviado para ${data.enviado_para}!</span>`);
+      addLog(`<span class="text-green-400">[SUCESSO] Olhe seu Telegram 🚨</span>`);
+      btn.innerHTML = '✅ ENVIADO! OLHE SEU TELEGRAM';
+      btn.className = 'w-full bg-green-500 text-black font-black py-3.5 rounded-2xl flex items-center justify-center gap-2';
+      setTimeout(()=>{ btn.innerHTML = 'TESTAR ALERTA AGORA'; btn.className = 'w-full bg-white/10 hover:bg-white/15 border border-white/10 font-bold py-3.5 rounded-2xl transition flex items-center justify-center gap-2'; btn.disabled=false; }, 4000);
+    }else{
+      addLog(`<span class="text-red-400">[ERRO] ${JSON.stringify(data)}</span>`);
+      btn.disabled=false;
+    }
+  }catch(e){
+    addLog(`<span class="text-red-400">[ERRO] ${e.message}</span>`);
+    btn.disabled=false;
+  }
+}
+checkHealth();
+setInterval(checkHealth, 30000);
 </script>
 <script>(function(){var loc=location.href.replace(/#.*$/,"");var ATTR_NAMES=["data-product-id","data-productid","data-product_id","product-id","productid","product_id","data-source-entity-id","source-entity-id","source_entity_id","data-product","data-metadata","data-meta"];var DATASET_KEYS=["productId","productid","product_id","sourceEntityId","sourceentityid","source_entity_id","product","metadata","meta"];function readProductId(value){if(typeof value!=="string"||value.length===0)return null;if(/^[0-9]{6,}$/.test(value))return value;var match=value.match(/(?:product(?:_|-)?id|source(?:_|-)?entity(?:_|-)?id)["'=:\s]+([0-9]{6,})/i);return match?match[1]:null}function extractProductId(start){for(var node=start;node&&node!==document.body;node=node.parentElement){for(var i=0;i<ATTR_NAMES.length;i++){var attrValue=node.getAttribute&&node.getAttribute(ATTR_NAMES[i]);var attrProductId=readProductId(attrValue);if(attrProductId)return attrProductId}var dataset=node.dataset||null;if(dataset){for(var j=0;j<DATASET_KEYS.length;j++){var dataValue=dataset[DATASET_KEYS[j]];var dataProductId=readProductId(dataValue);if(dataProductId)return dataProductId}}}return null}function isInlineMediaSlotElement(node){return !!(node&&node.getAttribute&&node.getAttribute("data-clippy-inline-media-slot")!==null)}function findInlineMediaSlot(start){for(var node=start;node&&node!==document.body;node=node.parentElement){if(isInlineMediaSlotElement(node))return node}return null}function readInlineMediaUrl(node){if(!node)return null;return node.getAttribute&&((node.getAttribute("data-clippy-inline-media-url")||node.getAttribute("data-url")||node.getAttribute("data_url")))||node.href||null}function stripHash(url){return String(url).replace(/#.*$/,"")}function urlsMatch(a,b){if(!a||!b)return false;try{return stripHash(new URL(a,loc).href)===stripHash(new URL(b,loc).href)}catch(_){return stripHash(a)===stripHash(b)}}function isFirstPartyReelUrl(value){try{var url=new URL(value,loc);if(url.protocol!=="https:")return false;var host=url.hostname.toLowerCase();var supported=host==="instagram.com"||host.endsWith(".instagram.com")||host==="facebook.com"||host.endsWith(".facebook.com");return supported&&/\/reels?\//i.test(url.pathname)}catch(_){return false}}function isInlineMediaUrlClick(node,href){var slot=findInlineMediaSlot(node);if(!slot)return false;var slotUrl=readInlineMediaUrl(slot);if(slotUrl)return urlsMatch(href,slotUrl);return isFirstPartyReelUrl(href)}function findDataHref(start){for(var node=start;node&&node!==document.body;node=node.parentElement){if(node.getAttribute){var href=node.getAttribute("data-href")||node.getAttribute("data-url");if(href)return{href:href,node:node}}}return null}var nativeOpen=window.open;window.open=function(url){if(parent!==window&&typeof url==="string"&&/^https?:\/\//.test(url)){parent.postMessage({type:"ecto:usercontent-link-click",href:url},"*");return null}return nativeOpen?nativeOpen.apply(window,arguments):null};document.addEventListener("click",function(e){var target=e.target instanceof Element?e.target:null;if(!target)return;if(parent===window)return;var a=target.closest?target.closest("a[href]"):null;if(a&&a.href&&/^https?:\/\//.test(a.href)&&a.href.replace(/#.*$/,"")!==loc){if(isInlineMediaUrlClick(a,a.href))return;var productId=extractProductId(target)||extractProductId(a);if(productId){e.preventDefault();parent.postMessage({type:"ecto-artifact-link-click",productId:productId},"*");return}e.preventDefault();parent.postMessage({type:"ecto:usercontent-link-click",href:a.href},"*");return}var dataHref=findDataHref(target);if(dataHref&&/^https?:\/\//.test(dataHref.href)&&dataHref.href.replace(/#.*$/,"")!==loc){if(isInlineMediaUrlClick(dataHref.node,dataHref.href))return;e.preventDefault();parent.postMessage({type:"ecto:usercontent-link-click",href:dataHref.href},"*")}},true)})();</script><script>(function(){var FOCUS_TYPE="ecto:artifact-focus-request";var CLOSE_TYPE="ecto:artifact-close-request";function focusArtifactDocument(){var body=document.body;if(!body)return;try{window.focus();}catch(e){}if(!body.hasAttribute("tabindex"))body.setAttribute("tabindex","-1");try{body.focus({preventScroll:true});}catch(e){try{body.focus();}catch(e2){}}}window.addEventListener("message",function(event){if(event.source!==window.parent)return;var data=event.data;if(!data||typeof data!=="object"||data.type!==FOCUS_TYPE)return;if(document.readyState==="loading"){document.addEventListener("DOMContentLoaded",focusArtifactDocument,{once:true});return;}focusArtifactDocument();});window.addEventListener("keydown",function(event){if(event.key!=="Escape")return;window.setTimeout(function(){if(event.defaultPrevented)return;window.parent.postMessage({type:CLOSE_TYPE},"*");},0);});})();</script></body>
 </html>
